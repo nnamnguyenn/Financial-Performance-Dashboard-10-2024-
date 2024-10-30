@@ -1,0 +1,111 @@
+---
+title: "Financial Performance Dashboard"
+subtitle: "Data Collected On 12 Companies (2009-2022)"
+author: "<div style='float: right;'>Nam Nguyen (USF)</div>"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: !expr bslib::bs_theme(version = 4, bootswatch = "yeti")
+    navbar:
+      - { icon: "fa-github", href: "https://github.com/NickRBX/Financial-Performance-Dashboard-10-2024-.git", style: "font-size: 4em;" }
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(DT)
+library(shiny)
+library(magrittr)
+library(shinydashboard)
+library(dygraphs)
+library(bslib)
+source("main.R")
+```
+
+# Main
+
+## Column {.sidebar data-width="200"}
+
+```{r}
+selectInput("company_graph", label = "Company:",
+            choices = unique(main_df$Company), selected = 'AAPL')
+```
+
+## Column
+
+### Income Statement
+
+```{r}
+renderPlot({
+  income_statement(input$company_graph)
+})
+```
+
+### Balance Sheet
+
+```{r}
+renderPlot({
+  balance_sheet(input$company_graph)
+})
+```
+
+## Column
+
+### Cash Flow Statement
+
+```{r}
+renderPlot({
+  cash_flow(input$company_graph)
+})
+
+```
+
+### Employee Changes
+
+```{r}
+renderPlot({
+  employee(input$company_graph)
+})
+
+```
+
+# Company Performance Comparison
+
+## Column {.sidebar data-width="200"}
+
+```{r}
+selectInput("size_graph", label = "Company Size: ",
+            choices = c('Large', 'Small'), selected = 'Large')
+selectInput("type_graph", label = "Metric: ",
+            choices = c('Revenue', 'Gross_Profit', "Net_Income", "EBITDA", "Expense", "COGS" ), selected = "Revenue")
+
+```
+
+## Column
+
+### Box-and-Whisker Plot For Metrics
+
+```{r}
+renderPlotly({
+  box_graph_decision(input$size_graph, input$type_graph)
+})
+
+```
+
+### Market Capitalisation
+
+```{r}
+renderPlotly({
+  cap_graph_decision(input$size_graph)
+})
+```
+
+# Processed Data
+
+```{r}
+renderDT({
+  datatable(main_df)
+})
+```
